@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "DarkSpot AI — See What's Missing | AI Research Intelligence Platform",
   description:
     "Evidence-first AI platform that detects information gaps, conflicting claims, outdated details, and unanswered questions across multiple research sources.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

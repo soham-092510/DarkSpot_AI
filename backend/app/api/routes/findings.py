@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from backend.app.core.database import get_db
-from backend.app.api.deps import get_current_user
+from backend.app.api.deps import get_current_user, get_optional_user, DEMO_PROJECT_ID
 from backend.app.models.all_models import (
     User, Project, Dimension, Claim, Finding, Source
 )
@@ -15,15 +15,26 @@ from backend.app.schemas.all_schemas import (
 router = APIRouter(prefix="/projects/{project_id}", tags=["Evidence & Findings"])
 
 
+def _check_project_access(project_id: str, user: Optional[User], db: Session) -> Project:
+    if project_id != DEMO_PROJECT_ID:
+        if not user:
+            raise HTTPException(status_code=401, detail="Authentication required.")
+        project = db.query(Project).filter(Project.id == project_id, Project.user_id == user.id).first()
+    else:
+        project = db.query(Project).filter(Project.id == DEMO_PROJECT_ID).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found.")
+    return project
+
+
 @router.get("/dimensions", response_model=List[DimensionOut])
 def get_project_dimensions(
     project_id: str,
-    current_user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found.")
+    project = _check_project_access(project_id, user, db)
 
     dims = db.query(Dimension).filter(Dimension.project_id == project_id).order_by(Dimension.order_index.asc()).all()
     results = []
@@ -47,9 +58,11 @@ def get_project_dimensions(
 def get_project_claims(
     project_id: str,
     dimension_id: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
+    project = _check_project_access(project_id, user, db)
+
     query = db.query(Claim, Source).join(Source, Claim.source_id == Source.id).filter(Claim.project_id == project_id)
     if dimension_id:
         query = query.filter(Claim.dimension_id == dimension_id)
@@ -79,9 +92,11 @@ def get_project_claims(
 def get_project_findings(
     project_id: str,
     finding_type: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
+    project = _check_project_access(project_id, user, db)
+
     query = db.query(Finding).filter(Finding.project_id == project_id)
     if finding_type:
         query = query.filter(Finding.finding_type == finding_type.upper())
@@ -124,16 +139,16 @@ def get_project_findings(
 @router.get("/conflicts", response_model=List[FindingOut])
 def get_project_conflicts(
     project_id: str,
-    current_user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
-    return get_project_findings(project_id, finding_type="CONFLICT", current_user=current_user, db=db)
+    return get_project_findings(project_id, finding_type="CONFLICT", user=user, db=db)
 
 
 @router.get("/gaps", response_model=List[FindingOut])
 def get_project_gaps(
     project_id: str,
-    current_user: User = Depends(get_current_user),
+    user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
-    return get_project_findings(project_id, finding_type="GAP", current_user=current_user, db=db)
+    return get_project_findings(project_id, finding_type="GAP", user=user, db=db)

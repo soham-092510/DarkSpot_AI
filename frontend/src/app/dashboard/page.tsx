@@ -26,7 +26,7 @@ import { BlindSpotRadar } from "@/components/dashboard/BlindSpotRadar";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const profile = useUserProfile();
+  const { profile } = useUserProfile();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

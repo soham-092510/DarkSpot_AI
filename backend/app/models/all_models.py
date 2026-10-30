@@ -23,10 +23,33 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=True)
     is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(255), nullable=True)
+    verification_token_expires_at = Column(DateTime, nullable=True)
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expires_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
     projects = relationship("Project", back_populates="user", cascade="all, delete-orphan")
+    credentials = relationship("ApiCredential", back_populates="user", cascade="all, delete-orphan")
+
+
+class ApiCredential(Base):
+    __tablename__ = "api_credentials"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    provider = Column(String(50), nullable=False)  # gemini, tavily
+    encrypted_key = Column(Text, nullable=False)  # AES-256-GCM ciphertext
+    key_mask = Column(String(50), nullable=False)  # Masked e.g. AIzaSy...4f9a
+    status = Column(String(32), default="untested")  # valid, invalid, untested
+    last_validated_at = Column(DateTime, nullable=True)
+    last_used_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+
+    user = relationship("User", back_populates="credentials")
 
 
 class Project(Base):

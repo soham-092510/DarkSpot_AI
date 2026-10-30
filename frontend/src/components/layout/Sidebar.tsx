@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   ArrowRight,
   BookOpen,
+  Key,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -41,6 +42,11 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
       href: "/history",
       label: "Research History",
       icon: History,
+    },
+    {
+      href: "/onboarding",
+      label: "BYOK API Keys",
+      icon: Key,
     },
     {
       href: "/settings",

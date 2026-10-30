@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from backend.app.services.ai.gemini_client import GeminiClient
 
 logger = logging.getLogger(__name__)
@@ -72,7 +72,8 @@ def calculate_evidence_coverage(dimensions_with_status: List[Dict[str, Any]]) ->
 def detect_gaps_and_blindspots(
     topic_question: str,
     dimensions: List[Dict[str, Any]],
-    claims: List[Dict[str, Any]]
+    claims: List[Dict[str, Any]],
+    api_key: Optional[str] = None
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Evaluates evidence coverage for each dimension, assigns coverage status,
@@ -114,7 +115,7 @@ def detect_gaps_and_blindspots(
 
     # Generate gap findings
     gap_findings = []
-    client = GeminiClient()
+    client = GeminiClient(api_key=api_key)
 
     if gap_targets and client.is_configured:
         targets_str = "\n".join([f"- {d['name']} ({d.get('category')}): {d.get('description', '')}" for d in gap_targets])

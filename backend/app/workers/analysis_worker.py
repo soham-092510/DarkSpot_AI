@@ -5,8 +5,9 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 from backend.app.core.database import SessionLocal
+from backend.app.core.security import decrypt_api_key
 from backend.app.models.all_models import (
-    Project, Source, Dimension, Claim, Finding, Task, Job, Report
+    Project, Source, Dimension, Claim, Finding, Task, Job, Report, ApiCredential
 )
 from backend.app.services.ai.decomposer import decompose_question
 from backend.app.services.ingestion.url_extractor import extract_content_from_url
@@ -48,8 +49,31 @@ def process_analysis_job(job_id: str):
         project.status = "analyzing"
         db.commit()
 
+        # Retrieve user BYOK credentials (decrypted strictly in-memory)
+        gemini_cred = db.query(ApiCredential).filter(
+            ApiCredential.user_id == project.user_id,
+            ApiCredential.provider == "gemini",
+            ApiCredential.status == "valid"
+        ).first()
+        tavily_cred = db.query(ApiCredential).filter(
+            ApiCredential.user_id == project.user_id,
+            ApiCredential.provider == "tavily",
+            ApiCredential.status == "valid"
+        ).first()
+
+        gemini_key = decrypt_api_key(gemini_cred.encrypted_key) if gemini_cred else None
+        tavily_key = decrypt_api_key(tavily_cred.encrypted_key) if tavily_cred else None
+
+        # Update last_used_at timestamp on credentials
+        now_ts = datetime.now(timezone.utc)
+        if gemini_cred:
+            gemini_cred.last_used_at = now_ts
+        if tavily_cred:
+            tavily_cred.last_used_at = now_ts
+        db.commit()
+
         # 2. Decompose Question into Research Dimensions
-        decomposition = decompose_question(project.topic_question)
+        decomposition = decompose_question(project.topic_question, api_key=gemini_key)
         raw_dims = decomposition.get("dimensions", [])
         search_queries = decomposition.get("search_queries", [])
 
@@ -81,7 +105,7 @@ def process_analysis_job(job_id: str):
         existing_sources = db.query(Source).filter(Source.project_id == project.id).all()
         if not existing_sources and search_queries:
             for query in search_queries[:2]:
-                web_hits = search_web_sources(query, max_results=3)
+                web_hits = search_web_sources(query, max_results=3, api_key=tavily_key)
                 for hit in web_hits:
                     # Avoid duplicate URLs
                     url = hit.get("url")
@@ -133,7 +157,7 @@ def process_analysis_job(job_id: str):
         all_claims = []
         for src in existing_sources:
             if src.status == "extracted" and src.clean_text:
-                extracted = extract_claims_from_source(src.title, src.clean_text, dim_dicts)
+                extracted = extract_claims_from_source(src.title, src.clean_text, dim_dicts, api_key=gemini_key)
                 for c_data in extracted:
                     # Match to dimension ID
                     d_name = c_data.get("dimension_name", "")
@@ -168,7 +192,8 @@ def process_analysis_job(job_id: str):
         updated_dims, gap_findings = detect_gaps_and_blindspots(
             project.topic_question,
             [{"name": d.name, "category": d.category, "importance_weight": d.importance_weight} for d in dimensions_list],
-            all_claims
+            all_claims,
+            api_key=gemini_key
         )
 
         # Update dimension status in DB
@@ -190,7 +215,8 @@ def process_analysis_job(job_id: str):
         conflict_dims, conflict_findings = detect_cross_source_conflicts(
             [{"name": d.name, "coverage_status": d.coverage_status, "importance_weight": d.importance_weight} for d in dimensions_list],
             all_claims,
-            sources_map
+            sources_map,
+            api_key=gemini_key
         )
         # Apply any newly conflicting dimension statuses
         for cd in conflict_dims:

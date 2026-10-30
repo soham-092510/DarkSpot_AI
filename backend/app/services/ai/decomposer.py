@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from backend.app.services.ai.gemini_client import GeminiClient
 
 logger = logging.getLogger(__name__)
@@ -26,12 +26,12 @@ Return a JSON object conforming strictly to this structure:
 """
 
 
-def decompose_question(topic_question: str) -> Dict[str, Any]:
+def decompose_question(topic_question: str, api_key: Optional[str] = None) -> Dict[str, Any]:
     """
     Decomposes a research question into core dimensions and search queries.
     Uses Gemini when configured; falls back to domain-aware heuristic decomposition.
     """
-    client = GeminiClient()
+    client = GeminiClient(api_key=api_key)
     if client.is_configured:
         prompt = f"Research Topic / Question to decompose: \"{topic_question}\""
         result = client.generate_json(SYSTEM_PROMPT, prompt)

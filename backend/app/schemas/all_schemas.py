@@ -9,7 +9,7 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=6)
+    password: str = Field(min_length=12, max_length=128, description="Password must be at least 12 characters long")
     full_name: Optional[str] = None
 
 
@@ -23,6 +23,7 @@ class UserOut(BaseModel):
     email: str
     full_name: Optional[str]
     is_active: bool
+    is_verified: bool = False
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -32,6 +33,60 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserOut
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str = Field(min_length=12, max_length=128, description="Password must be at least 12 characters long")
+
+
+class EmailVerificationRequest(BaseModel):
+    token: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=12, max_length=128, description="Password must be at least 12 characters long")
+
+
+class UserUpdateProfile(BaseModel):
+    full_name: Optional[str] = None
+
+
+# ==============================================================================
+# BYOK (Bring Your Own Key) Schemas
+# ==============================================================================
+
+class ApiCredentialCreate(BaseModel):
+    provider: str = Field(pattern="^(gemini|tavily)$")
+    api_key: str = Field(min_length=8, max_length=256)
+
+
+class ApiCredentialOut(BaseModel):
+    id: str
+    provider: str
+    key_mask: str
+    status: str
+    last_validated_at: Optional[datetime] = None
+    last_used_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ApiCredentialTestRequest(BaseModel):
+    provider: str = Field(pattern="^(gemini|tavily)$")
+    api_key: str = Field(min_length=8, max_length=256)
+
+
+class ApiCredentialTestResponse(BaseModel):
+    valid: bool
+    provider: str
+    message: str
 
 
 # ==============================================================================

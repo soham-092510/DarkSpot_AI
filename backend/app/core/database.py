@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.orm import declarative_base, sessionmaker
 from backend.app.core.config import settings
 
@@ -36,5 +36,26 @@ def get_db():
 
 
 def init_db():
-    """Initializes tables in database."""
+    """Initializes tables and handles schema migrations for SQLite."""
     Base.metadata.create_all(bind=engine)
+
+    # Auto-migration for SQLite dev instances to ensure newly added columns exist
+    if is_sqlite:
+        with engine.connect() as conn:
+            inspector = inspect(engine)
+            if "users" in inspector.get_table_names():
+                existing_cols = {c["name"] for c in inspector.get_columns("users")}
+                new_cols = [
+                    ("is_verified", "BOOLEAN DEFAULT 0"),
+                    ("verification_token", "VARCHAR(255)"),
+                    ("verification_token_expires_at", "DATETIME"),
+                    ("reset_token", "VARCHAR(255)"),
+                    ("reset_token_expires_at", "DATETIME"),
+                ]
+                for col_name, col_type in new_cols:
+                    if col_name not in existing_cols:
+                        try:
+                            conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+                            conn.commit()
+                        except Exception:
+                            pass

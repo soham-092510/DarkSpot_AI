@@ -18,8 +18,10 @@ import {
   Clock,
   ShieldAlert,
   RefreshCw,
+  Key,
 } from "lucide-react";
-import { createProject, uploadDocument } from "@/lib/api";
+import Link from "next/link";
+import { createProject, uploadDocument, getCredentials } from "@/lib/api";
 
 function NewResearchContent() {
   const router = useRouter();
@@ -32,6 +34,17 @@ function NewResearchContent() {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasGeminiKey, setHasGeminiKey] = useState<boolean | null>(null);
+
+  // Check BYOK configuration
+  useEffect(() => {
+    getCredentials()
+      .then((creds) => {
+        const has = creds.some((c) => c.provider === "gemini" && c.status === "valid");
+        setHasGeminiKey(has);
+      })
+      .catch(() => setHasGeminiKey(false));
+  }, []);
 
   // Prefill from query parameter if present
   useEffect(() => {
@@ -158,6 +171,25 @@ function NewResearchContent() {
           <span>Estimated duration: <strong>15–30s</strong></span>
         </div>
       </div>
+
+      {/* BYOK Warning if Gemini is unconfigured */}
+      {hasGeminiKey === false && (
+        <div className="flex items-start justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 shadow-2xs">
+          <div className="flex items-start gap-3">
+            <Key className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <strong>BYOK Recommended:</strong> You have not appended your Google Gemini API key yet.
+              You can run research using heuristic fallback, or configure your key for advanced atomic claim extraction.
+            </div>
+          </div>
+          <Link
+            href="/onboarding"
+            className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-amber-700"
+          >
+            Append API Key
+          </Link>
+        </div>
+      )}
 
       {/* Quick Investigation Templates */}
       <div className="space-y-3">

@@ -7,6 +7,12 @@
 # 3. darkspot-worker: Python Asynchronous Background Analysis Worker
 # 4. darkspot-frontend: Next.js 14 App Router Node Web Service
 
+envVarGroups:
+  - name: darkspot-security
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+
 databases:
   - name: darkspot-db
     databaseName: darkspot
@@ -22,6 +28,7 @@ services:
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      - fromGroup: darkspot-security
       - key: PYTHON_VERSION
         value: 3.10.11
       - key: ENVIRONMENT
@@ -32,12 +39,6 @@ services:
         fromDatabase:
           name: darkspot-db
           property: connectionString
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GEMINI_MODEL
-        value: gemini-2.0-flash
-      - key: TAVILY_API_KEY
-        sync: false
       - key: BACKEND_CORS_ORIGINS
         value: '["*"]'
 
@@ -48,6 +49,7 @@ services:
     buildCommand: pip install -r backend/requirements.txt
     startCommand: python -m backend.app.workers.analysis_worker
     envVars:
+      - fromGroup: darkspot-security
       - key: PYTHON_VERSION
         value: 3.10.11
       - key: ENVIRONMENT
@@ -58,12 +60,6 @@ services:
         fromDatabase:
           name: darkspot-db
           property: connectionString
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GEMINI_MODEL
-        value: gemini-2.0-flash
-      - key: TAVILY_API_KEY
-        sync: false
 
   # 3. Next.js 14 Frontend Web Application
   - type: web

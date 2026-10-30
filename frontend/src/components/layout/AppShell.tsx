@@ -21,7 +21,11 @@ export function AppShell({ children }: AppShellProps) {
   const isPublicPage =
     pathname === "/" ||
     pathname === "/login" ||
-    pathname === "/signup";
+    pathname === "/signup" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname === "/verify-email" ||
+    pathname === "/onboarding";
 
   if (isPublicPage) {
     return (

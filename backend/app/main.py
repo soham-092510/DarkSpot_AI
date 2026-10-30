@@ -7,7 +7,7 @@ from sqlalchemy import text
 from backend.app.core.config import settings
 from backend.app.core.database import init_db, get_db
 from backend.app.api.routes import (
-    auth, projects, sources, analysis, findings, tasks, reports, demo
+    auth, credentials, projects, sources, analysis, findings, tasks, reports, demo
 )
 
 
@@ -56,6 +56,7 @@ def readiness_check(db: Session = Depends(get_db)):
 
 # Include Routers
 app.include_router(auth.router, prefix="/api")
+app.include_router(credentials.router, prefix="/api")
 app.include_router(projects.router, prefix="/api")
 app.include_router(sources.router, prefix="/api")
 app.include_router(analysis.router, prefix="/api")

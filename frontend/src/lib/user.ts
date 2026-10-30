@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getAuthToken, removeAuthToken } from "./api";
 
 export interface UserProfile {
   name: string;
   email: string;
   role: string;
   initials: string;
+  isVerified?: boolean;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -14,7 +16,13 @@ const DEFAULT_PROFILE: UserProfile = {
   email: "researcher@darkspot.ai",
   role: "Intelligence Analyst",
   initials: "LR",
+  isVerified: true,
 };
+
+export function isAuthenticated(): boolean {
+  if (typeof window === "undefined") return false;
+  return Boolean(getAuthToken());
+}
 
 export function getStoredUser(): UserProfile {
   if (typeof window === "undefined") return DEFAULT_PROFILE;
@@ -25,6 +33,7 @@ export function getStoredUser(): UserProfile {
     const name = parsed.name || parsed.full_name || DEFAULT_PROFILE.name;
     const initials = name
       .split(" ")
+      .filter(Boolean)
       .map((part: string) => part[0])
       .join("")
       .substring(0, 2)
@@ -34,6 +43,7 @@ export function getStoredUser(): UserProfile {
       email: parsed.email || DEFAULT_PROFILE.email,
       role: parsed.role || DEFAULT_PROFILE.role,
       initials,
+      isVerified: parsed.is_verified ?? true,
     };
   } catch {
     return DEFAULT_PROFILE;
@@ -42,10 +52,21 @@ export function getStoredUser(): UserProfile {
 
 export function useUserProfile() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
+  const [isAuth, setIsAuth] = useState<boolean>(false);
 
   useEffect(() => {
     setProfile(getStoredUser());
+    setIsAuth(isAuthenticated());
   }, []);
 
-  return profile;
+  const logout = () => {
+    removeAuthToken();
+    setIsAuth(false);
+    setProfile(DEFAULT_PROFILE);
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+  };
+
+  return { profile, isAuth, logout };
 }

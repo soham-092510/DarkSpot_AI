@@ -1,6 +1,5 @@
-import re
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from backend.app.services.ai.gemini_client import GeminiClient
 
 logger = logging.getLogger(__name__)
@@ -36,7 +35,8 @@ Return a JSON object conforming strictly to this format:
 def extract_claims_from_source(
     source_title: str,
     source_text: str,
-    dimensions: List[Dict[str, Any]]
+    dimensions: List[Dict[str, Any]],
+    api_key: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Extracts atomic claims from a source text and maps them to research dimensions.
@@ -46,7 +46,7 @@ def extract_claims_from_source(
         return []
 
     dimension_names = [d["name"] for d in dimensions]
-    client = GeminiClient()
+    client = GeminiClient(api_key=api_key)
 
     if client.is_configured:
         dims_str = "\n".join([f"- {d['name']} ({d.get('category', 'General')}): {d.get('description', '')}" for d in dimensions])

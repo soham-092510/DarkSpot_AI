@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from backend.app.services.ai.gemini_client import GeminiClient
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,8 @@ Return a JSON object conforming strictly to this format:
 def detect_cross_source_conflicts(
     dimensions: List[Dict[str, Any]],
     claims: List[Dict[str, Any]],
-    sources_map: Dict[str, Dict[str, Any]]
+    sources_map: Dict[str, Dict[str, Any]],
+    api_key: Optional[str] = None
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Compares claims across distinct sources within each dimension to identify potential contradictions.
@@ -50,7 +51,7 @@ def detect_cross_source_conflicts(
     conflict_findings = []
     conflicted_dim_names = set()
 
-    client = GeminiClient()
+    client = GeminiClient(api_key=api_key)
 
     for dim in dimensions:
         dname = dim["name"]

@@ -1,22 +1,109 @@
+import base64
+import hashlib
 import ipaddress
+import os
+import secrets
 import socket
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
+import argon2
+from argon2 import PasswordHasher, Type
+from argon2.exceptions import VerifyMismatchError
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from backend.app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+# Initialize Argon2id password hasher with RFC-recommended parameters
+argon2_hasher = PasswordHasher(
+    time_cost=2,
+    memory_cost=65536,
+    parallelism=1,
+    hash_len=32,
+    type=Type.ID
+)
+fallback_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    """Hashes password securely using Argon2id."""
+    return argon2_hasher.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifies a plain password against an Argon2id or legacy bcrypt hash."""
+    if not hashed_password or not plain_password:
+        return False
+    if hashed_password.startswith("$argon2"):
+        try:
+            return argon2_hasher.verify(hashed_password, plain_password)
+        except (VerifyMismatchError, Exception):
+            return False
+    # Legacy bcrypt fallback
+    try:
+        return fallback_pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        return False
+
+
+def generate_secure_token() -> str:
+    """Generates a cryptographically secure 256-bit URL-safe token for email verification / password reset."""
+    return secrets.token_urlsafe(32)
+
+
+# ==============================================================================
+# AES-256-GCM BYOK Credential Encryption
+# ==============================================================================
+
+def _get_aes_key() -> bytes:
+    """Derives a deterministic 256-bit AES master key from SECRET_KEY."""
+    raw = settings.SECRET_KEY.encode()
+    return hashlib.sha256(raw).digest()
+
+
+def encrypt_api_key(plain_key: str) -> str:
+    """
+    Encrypts a user's API key using AES-256-GCM with a unique 96-bit random nonce.
+    Returns base64-encoded nonce + ciphertext.
+    """
+    if not plain_key or not plain_key.strip():
+        raise ValueError("Cannot encrypt an empty API key")
+    clean = plain_key.strip().encode("utf-8")
+    aesgcm = AESGCM(_get_aes_key())
+    nonce = os.urandom(12)  # 96-bit unique nonce per encryption
+    ciphertext = aesgcm.encrypt(nonce, clean, None)
+    return base64.urlsafe_b64encode(nonce + ciphertext).decode("utf-8")
+
+
+def decrypt_api_key(encrypted_str: str) -> str:
+    """
+    Decrypts an AES-256-GCM encrypted API key string.
+    Decryption is restricted to server-side execution.
+    """
+    if not encrypted_str:
+        return ""
+    try:
+        raw = base64.urlsafe_b64decode(encrypted_str.encode("utf-8"))
+        if len(raw) < 13:
+            return ""
+        nonce, ciphertext = raw[:12], raw[12:]
+        aesgcm = AESGCM(_get_aes_key())
+        decrypted = aesgcm.decrypt(nonce, ciphertext, None)
+        return decrypted.decode("utf-8")
+    except Exception:
+        return ""
+
+
+def mask_api_key(plain_key: str) -> str:
+    """
+    Returns a safe masked version of the key for UI display (e.g. AIzaSy...4f9a).
+    Never exposes the full key.
+    """
+    if not plain_key or len(plain_key) < 8:
+        return "••••••••"
+    return f"{plain_key[:6]}...{plain_key[-4:]}"
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: Optional[timedelta] = None) -> str:

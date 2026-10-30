@@ -1,20 +1,26 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import httpx
 from backend.app.core.config import settings
 
 
-def search_web_sources(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
+def search_web_sources(
+    query: str,
+    max_results: int = 5,
+    api_key: Optional[str] = None
+) -> List[Dict[str, Any]]:
     """
     Searches the live web using the Tavily Search API.
+    Supports user's Bring-Your-Own-Key (BYOK) with fallback to environment key.
     Returns list of source dictionaries with url, title, snippet.
     """
-    if not settings.TAVILY_API_KEY:
-        # Gracefully return empty when API key is not yet configured
+    effective_key = api_key or settings.TAVILY_API_KEY
+    if not effective_key:
+        # Gracefully return empty when API key is not configured
         return []
 
     url = "https://api.tavily.com/search"
     payload = {
-        "api_key": settings.TAVILY_API_KEY,
+        "api_key": effective_key,
         "query": query,
         "search_depth": "basic",
         "include_answer": False,

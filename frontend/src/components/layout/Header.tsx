@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export function Header({ onToggleMobile }: HeaderProps) {
   const router = useRouter();
-  const profile = useUserProfile();
+  const { profile, logout } = useUserProfile();
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -34,10 +34,7 @@ export function Header({ onToggleMobile }: HeaderProps) {
   };
 
   const handleSignOut = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("darkspot_user");
-    }
-    router.push("/login");
+    logout();
   };
 
   return (
