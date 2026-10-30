@@ -1,7 +1,7 @@
 """
-Official Shinchan Online Hackathon 2026 Sample Demonstration Dataset.
+Official DarkSpot AI Sample Demonstration Dataset.
 Topic: "ABC Scholarship 2026 — Verification & Eligibility Research"
-NOTE: Clearly labeled as illustrative sample data for hackathon evaluation.
+NOTE: Clearly labeled as illustrative sample data for product demonstration.
 """
 
 DEMO_PROJECT = {

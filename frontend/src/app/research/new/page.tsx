@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Compass,
   Plus,
@@ -12,35 +12,62 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  Globe,
+  FileCheck,
+  CheckCircle2,
+  Clock,
+  ShieldAlert,
+  RefreshCw,
 } from "lucide-react";
 import { createProject, uploadDocument } from "@/lib/api";
 
-export default function NewResearchPage() {
+function NewResearchContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [title, setTitle] = useState("");
   const [question, setQuestion] = useState("");
-  const [depth, setDepth] = useState("standard");
+  const [depth, setDepth] = useState<"standard" | "deep">("standard");
   const [urls, setUrls] = useState<string[]>([""]);
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sampleTemplates = [
+  // Prefill from query parameter if present
+  useEffect(() => {
+    const topicParam = searchParams.get("topic");
+    if (topicParam) {
+      setTitle(topicParam);
+      setQuestion(
+        `What are the specific eligibility criteria, mandatory conditions, deadlines, and critical prerequisites for ${topicParam}?`
+      );
+    }
+  }, [searchParams]);
+
+  const quickTemplates = [
     {
-      title: "Scholarship Verification 2026",
+      title: "Scholarship & Grant Verification",
       question:
         "What are the eligibility criteria, required income thresholds, deadline, and renewal conditions for the national merit scholarship?",
+      tag: "Academic",
+      icon: Sparkles,
+      color: "bg-blue-50 text-brand-700 border-blue-200",
     },
     {
-      title: "AI Engineer Job Opportunity Verification",
-      question:
-        "What are the mandatory qualifications, salary range, remote policies, and interview stages for the AI Systems Engineer role?",
-    },
-    {
-      title: "Corporate Data Privacy Compliance 2026",
+      title: "Corporate Compliance Audit",
       question:
         "What are the mandatory notification deadlines, audit requirements, and liability penalties under the updated data protection framework?",
+      tag: "Governance",
+      icon: ShieldAlert,
+      color: "bg-purple-50 text-purple-700 border-purple-200",
+    },
+    {
+      title: "Clinical Trial & Healthcare Protocol",
+      question:
+        "What are the inclusion/exclusion criteria, primary efficacy endpoints, contraindications, and regulatory reporting requirements?",
+      tag: "Biomedical",
+      icon: FileCheck,
+      color: "bg-emerald-50 text-emerald-700 border-emerald-200",
     },
   ];
 
@@ -109,50 +136,100 @@ export default function NewResearchPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          Launch Evidence-First Research
-        </h1>
-        <p className="text-xs text-slate-500 mt-1">
-          DarkSpot AI will deconstruct your question into research dimensions, gather sources,
-          extract atomic claims, and detect what information is missing or contradictory.
-        </p>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-600 text-white shadow-xs">
+              <Compass className="h-4 w-4" />
+            </span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              Start Evidence Analysis
+            </h1>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            Deconstruct inquiry questions, cross-verify multiple sources, and isolate hidden information gaps.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <Clock className="h-3.5 w-3.5 text-brand-600" />
+          <span>Estimated duration: <strong>15–30s</strong></span>
+        </div>
       </div>
 
-      {/* Template Suggestions */}
-      <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5" /> Quick Investigation Templates:
-        </span>
-        <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {sampleTemplates.map((t) => (
-            <button
-              key={t.title}
-              type="button"
-              onClick={() => applyTemplate(t)}
-              className="text-left rounded-lg border border-blue-200 bg-white p-2.5 text-xs text-slate-700 hover:border-brand-500 hover:shadow-2xs transition"
-            >
-              <span className="font-bold text-slate-900 block truncate">{t.title}</span>
-              <span className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{t.question}</span>
-            </button>
-          ))}
+      {/* Quick Investigation Templates */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Quick Investigation Templates
+          </h2>
+          <span className="text-[11px] text-slate-400">
+            Click to auto-populate scope
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {quickTemplates.map((t) => {
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.title}
+                type="button"
+                onClick={() => applyTemplate(t)}
+                className="group relative flex flex-col justify-between text-left rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition hover:border-brand-400 hover:shadow-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${t.color}`}
+                    >
+                      {t.tag}
+                    </span>
+                    <Icon className="h-4 w-4 text-slate-400 group-hover:text-brand-600 transition" />
+                  </div>
+                  <h3 className="mt-3 text-xs font-bold text-slate-900 group-hover:text-brand-600 transition">
+                    {t.title}
+                  </h3>
+                  <p className="mt-1 text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                    {t.question}
+                  </p>
+                </div>
+                <div className="mt-3 flex items-center gap-1 text-[11px] font-semibold text-brand-600">
+                  <span>Use template</span>
+                  <ArrowRight className="h-3 w-3" />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 flex items-center gap-2">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 flex items-center gap-3">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
+      {/* Form Area */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title & Question */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
-          <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-            1. Core Inquiry & Scope
-          </h2>
+        {/* Card 1: Core Inquiry & Scope */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
+          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">
+                1. Investigation Scope & Depth
+              </h2>
+              <p className="text-[11px] text-slate-500">
+                Define the core inquiry and configure analysis granularity.
+              </p>
+            </div>
+            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">
+              Required
+            </span>
+          </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -164,33 +241,33 @@ export default function NewResearchPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. ABC Merit Scholarship 2026 Guidelines & Verification"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Detailed Research Question or Goal
+              Primary Research Question or Hypothesis
             </label>
             <textarea
               required
               rows={3}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="What are the specific requirements, deadlines, and critical prerequisites that need to be verified?"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              placeholder="What are the specific eligibility requirements, financial thresholds, deadlines, and prerequisites that must be corroborated?"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Research Depth
+            <label className="block text-xs font-semibold text-slate-700 mb-2">
+              Analysis Depth
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label
-                className={`flex items-center gap-2 rounded-lg border p-3 cursor-pointer text-xs transition ${
+                className={`flex items-center gap-3 rounded-xl border p-3.5 cursor-pointer text-xs transition ${
                   depth === "standard"
-                    ? "border-brand-500 bg-brand-50/50 text-brand-900 font-semibold"
+                    ? "border-brand-500 bg-blue-50/50 text-brand-950 font-semibold ring-1 ring-brand-500"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -200,20 +277,20 @@ export default function NewResearchPage() {
                   value="standard"
                   checked={depth === "standard"}
                   onChange={() => setDepth("standard")}
-                  className="text-brand-600"
+                  className="text-brand-600 h-4 w-4"
                 />
                 <div>
                   <span className="block font-bold">Standard Analysis</span>
-                  <span className="text-[10px] text-slate-500">
-                    5 Dimensions, fast crawl & claim verification
+                  <span className="text-[11px] text-slate-500">
+                    Fast multi-source crawl, 5 dimensions, core contradiction scan
                   </span>
                 </div>
               </label>
 
               <label
-                className={`flex items-center gap-2 rounded-lg border p-3 cursor-pointer text-xs transition ${
+                className={`flex items-center gap-3 rounded-xl border p-3.5 cursor-pointer text-xs transition ${
                   depth === "deep"
-                    ? "border-brand-500 bg-brand-50/50 text-brand-900 font-semibold"
+                    ? "border-brand-500 bg-blue-50/50 text-brand-950 font-semibold ring-1 ring-brand-500"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -223,12 +300,12 @@ export default function NewResearchPage() {
                   value="deep"
                   checked={depth === "deep"}
                   onChange={() => setDepth("deep")}
-                  className="text-brand-600"
+                  className="text-brand-600 h-4 w-4"
                 />
                 <div>
-                  <span className="block font-bold">Deep Audit</span>
-                  <span className="text-[10px] text-slate-500">
-                    Comprehensive cross-source contradiction scan & full dossier
+                  <span className="block font-bold">Deep Forensic Audit</span>
+                  <span className="text-[11px] text-slate-500">
+                    Exhaustive cross-source corroboration, granular caveats & full dossier
                   </span>
                 </div>
               </label>
@@ -236,42 +313,47 @@ export default function NewResearchPage() {
           </div>
         </div>
 
-        {/* URLs Ingestion */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        {/* Card 2: Web Sources (URLs) */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h2 className="text-sm font-bold text-slate-900">
                 2. Target Source URLs (Optional)
               </h2>
               <p className="text-[11px] text-slate-500">
-                Provide specific links to compare. If left empty, Tavily web search will discover relevant sources.
+                Provide specific links to analyze. If left empty, Tavily Search automatically gathers authoritative web pages.
               </p>
             </div>
             <button
               type="button"
               onClick={handleAddUrl}
-              className="flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+              className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>Add URL</span>
             </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {urls.map((u, i) => (
               <div key={i} className="flex items-center gap-2">
-                <input
-                  type="url"
-                  value={u}
-                  onChange={(e) => handleUrlChange(i, e.target.value)}
-                  placeholder="https://example.gov.in/guidelines-2026.html"
-                  className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                />
+                <div className="relative flex-1">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Globe className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input
+                    type="url"
+                    value={u}
+                    onChange={(e) => handleUrlChange(i, e.target.value)}
+                    placeholder="https://example.gov.in/guidelines-2026.html"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none"
+                  />
+                </div>
                 {urls.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveUrl(i)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded"
+                    className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -281,42 +363,47 @@ export default function NewResearchPage() {
           </div>
         </div>
 
-        {/* Document Ingestion */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
-          <div className="border-b border-slate-100 pb-2">
+        {/* Card 3: Document Ingestion */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+          <div className="border-b border-slate-100 pb-3">
             <h2 className="text-sm font-bold text-slate-900">
               3. Document Ingestion (Optional)
             </h2>
             <p className="text-[11px] text-slate-500">
-              Upload PDF notices, Word circulars, or text documents (Up to 10MB each).
+              Upload local circulars, policy PDFs, or text documents (Up to 10MB each).
             </p>
           </div>
 
-          <div className="relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/50 p-6 text-center hover:bg-slate-50 transition">
-            <UploadCloud className="h-8 w-8 text-slate-400 mb-2" />
-            <p className="text-xs font-semibold text-slate-700">
-              Drag and drop documents, or <span className="text-brand-600 underline">browse</span>
+          <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-8 text-center hover:bg-slate-50 transition cursor-pointer">
+            <UploadCloud className="h-10 w-10 text-brand-600 mb-2" />
+            <p className="text-xs font-bold text-slate-900">
+              Drag and drop documents here, or <span className="text-brand-600 underline">browse files</span>
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">Supported formats: .pdf, .docx, .txt</p>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Supported formats: PDF, DOCX, TXT, CSV (up to 10MB)
+            </p>
             <input
               type="file"
               multiple
-              accept=".pdf,.docx,.txt"
+              accept=".pdf,.docx,.txt,.csv"
               onChange={handleFileChange}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
           </div>
 
           {files.length > 0 && (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase text-slate-400">
+                Uploaded Files ({files.length}):
+              </span>
               {files.map((f, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700"
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-700"
                 >
-                  <div className="flex items-center gap-2 truncate">
+                  <div className="flex items-center gap-2.5 truncate">
                     <FileText className="h-4 w-4 text-brand-600 flex-shrink-0" />
-                    <span className="truncate">{f.name}</span>
+                    <span className="truncate font-semibold">{f.name}</span>
                     <span className="text-[10px] text-slate-400">
                       ({(f.size / 1024).toFixed(0)} KB)
                     </span>
@@ -324,9 +411,9 @@ export default function NewResearchPage() {
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(idx)}
-                    className="text-slate-400 hover:text-rose-600 p-1"
+                    className="p-1 text-slate-400 hover:text-rose-600"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               ))}
@@ -334,19 +421,19 @@ export default function NewResearchPage() {
           )}
         </div>
 
-        {/* Launch Button */}
-        <div className="flex items-center justify-end gap-3 pt-4">
+        {/* Action Controls */}
+        <div className="flex items-center justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={() => router.push("/dashboard")}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-brand-600 px-7 py-2.5 text-xs font-bold text-white shadow-md hover:bg-brand-700 disabled:opacity-50 transition active:scale-[0.98]"
           >
             {loading ? (
               <>
@@ -355,14 +442,30 @@ export default function NewResearchPage() {
               </>
             ) : (
               <>
-                <Compass className="h-4 w-4" />
                 <span>Start Evidence Analysis</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
         </div>
       </form>
     </div>
+  );
+}
+
+export default function NewResearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-96 items-center justify-center">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+            <RefreshCw className="h-4 w-4 animate-spin text-brand-600" />
+            <span>Loading Research Workspace Form...</span>
+          </div>
+        </div>
+      }
+    >
+      <NewResearchContent />
+    </Suspense>
   );
 }

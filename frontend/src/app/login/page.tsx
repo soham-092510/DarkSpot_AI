@@ -34,10 +34,10 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Quick Evaluator Access */}
+        {/* Quick Demo Access */}
         <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-center">
           <span className="text-[10px] font-bold uppercase text-brand-800 block">
-            Hackathon Evaluators & Judges
+            Instant Demo Access
           </span>
           <button
             type="button"
@@ -45,7 +45,7 @@ export default function LoginPage() {
             className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 active:scale-[0.98]"
           >
             <Sparkles className="h-4 w-4" />
-            <span>Enter as Evaluation Researcher (Instant Access)</span>
+            <span>Enter as Lead Researcher (Instant Access)</span>
           </button>
         </div>
 
@@ -59,7 +59,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="evaluator@shinchan-hackathon.org"
+              placeholder="researcher@darkspot.ai"
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>

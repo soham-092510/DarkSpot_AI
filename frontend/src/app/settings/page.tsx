@@ -27,14 +27,61 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          System Configuration & API Settings
+          System Configuration & Settings
         </h1>
         <p className="text-xs text-slate-500 mt-1">
-          Verify external service connectivity, model selection, and database status.
+          Manage your researcher profile, verify external service connectivity, and inspect system health.
         </p>
       </div>
 
       <div className="space-y-6">
+        {/* User Profile Card */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Researcher Profile</h3>
+              <p className="text-xs text-slate-500">Configure your display name and intelligence role</p>
+            </div>
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+              Active Session
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Display Name
+              </label>
+              <input
+                type="text"
+                defaultValue={typeof window !== "undefined" ? JSON.parse(localStorage.getItem("darkspot_user") || "{}").name || "Lead Researcher" : "Lead Researcher"}
+                onChange={(e) => {
+                  if (typeof window !== "undefined") {
+                    const existing = JSON.parse(localStorage.getItem("darkspot_user") || "{}");
+                    localStorage.setItem("darkspot_user", JSON.stringify({ ...existing, name: e.target.value }));
+                  }
+                }}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Professional Role
+              </label>
+              <input
+                type="text"
+                defaultValue={typeof window !== "undefined" ? JSON.parse(localStorage.getItem("darkspot_user") || "{}").role || "Intelligence Analyst" : "Intelligence Analyst"}
+                onChange={(e) => {
+                  if (typeof window !== "undefined") {
+                    const existing = JSON.parse(localStorage.getItem("darkspot_user") || "{}");
+                    localStorage.setItem("darkspot_user", JSON.stringify({ ...existing, role: e.target.value }));
+                  }
+                }}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
         {/* Backend & DB Health Card */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">

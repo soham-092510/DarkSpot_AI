@@ -20,9 +20,9 @@ DEMO_PROJECT_ID = "00000000-0000-0000-0000-000000000099"
 @router.get("")
 def get_or_initialize_demo_project(db: Session = Depends(get_db)):
     """
-    Returns the official Hackathon sample research project:
+    Returns the pre-seeded sample research project:
     ABC Scholarship 2026.
-    Ensures pre-seeded, high-fidelity sample data is available for judges without requiring API keys.
+    Ensures pre-seeded, high-fidelity sample data is available for instant product demonstration.
     """
     # Ensure demo user exists
     user = db.query(User).filter(User.id == DEFAULT_DEMO_USER_ID).first()
@@ -175,5 +175,5 @@ def get_or_initialize_demo_project(db: Session = Depends(get_db)):
         "status": project.status,
         "coverage_score": project.coverage_score,
         "is_sample_demo": True,
-        "notice": "Official Shinchan Online Hackathon 2026 Sample Dataset (ABC Scholarship 2026). Clearly labeled illustrative evaluation data."
+        "notice": "DarkSpot AI Interactive Sample Dataset (ABC Scholarship 2026). Clearly labeled illustrative demonstration data."
     }

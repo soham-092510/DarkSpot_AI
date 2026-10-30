@@ -26,7 +26,7 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold tracking-tight text-slate-900">DarkSpot AI</span>
                 <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 border border-blue-200">
-                  Shinchan 2026
+                  Enterprise
                 </span>
               </div>
               <p className="text-[10px] font-medium text-slate-700">See What's Missing</p>

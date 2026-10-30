@@ -13,13 +13,13 @@ export function Footer() {
 
         <div className="flex items-center gap-6">
           <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
-            Shinchan Online Hackathon 2026
+            Enterprise Intelligence v1.0
           </span>
           <Link
             href="/demo"
             className="flex items-center gap-1 font-medium text-brand-600 hover:underline"
           >
-            <span>Evaluation Showcase</span>
+            <span>Live Demonstration</span>
             <ExternalLink className="h-3 w-3" />
           </Link>
           <a

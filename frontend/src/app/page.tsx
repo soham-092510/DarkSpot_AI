@@ -55,17 +55,17 @@ export default function HomePage() {
 
   const innovations = [
     {
-      title: "Innovation A: Evidence Coverage Matrix",
+      title: "Evidence Coverage Matrix",
       desc: "Deconstructs research questions into weighted dimensions. Computes a deterministic Coverage Index and links every finding to verbatim source excerpts.",
       metric: "Weighted Coverage Formula",
     },
     {
-      title: "Innovation B: Contradiction Intelligence",
+      title: "Contradiction Intelligence",
       desc: "Extracts atomic claims and performs cross-source semantic comparisons. Automatically differentiates genuine contradictions from contextual differences.",
       metric: "Semantic Discrepancy Engine",
     },
     {
-      title: "Innovation C: Research Blind-Spot Radar",
+      title: "Research Blind-Spot Radar",
       desc: "Visualizes information blind spots and synthesizes targeted unanswered questions with explicit explanations of why each omission matters.",
       metric: "Risk-Ranked Action Plan",
     },
@@ -79,7 +79,7 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-semibold text-brand-700 shadow-2xs">
               <Sparkles className="h-3.5 w-3.5 text-brand-600" />
-              <span>Shinchan Online Hackathon 2026 — Official Solution</span>
+              <span>AI-Assisted Information Gap & Contradiction Detection Platform</span>
             </div>
 
             <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">

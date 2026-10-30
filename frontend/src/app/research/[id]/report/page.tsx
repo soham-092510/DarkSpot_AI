@@ -119,7 +119,7 @@ export default function ResearchReportPage() {
             <div className="border-b border-slate-200 pb-6">
               <div className="flex items-center gap-2 text-xs font-bold text-brand-700 uppercase mb-2">
                 <ShieldAlert className="h-4 w-4" />
-                <span>DarkSpot AI Research Dossier · Shinchan Online Hackathon 2026</span>
+                <span>DarkSpot AI · Executive Research Dossier</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                 {report.title}

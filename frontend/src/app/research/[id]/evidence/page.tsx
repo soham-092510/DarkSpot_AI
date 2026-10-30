@@ -116,7 +116,7 @@ export default function EvidenceMatrixPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-brand-600 uppercase">
-                  Innovation A
+                  Dimensional Verification
                 </span>
                 <span className="text-xs text-slate-400">·</span>
                 <span className="text-xs text-slate-500">Traceable Provenance</span>

@@ -9,7 +9,7 @@ Use this checklist before and after deploying **DarkSpot AI** to ensure all requ
 - [x] SSRF Guard active: loopback (`127.0.0.1`), metadata IP (`169.254.169.254`), and private networks blocked.
 - [x] Verbatim quote integrity enforced (claims must preserve exact source excerpt).
 - [x] Uncertainty and limitation disclaimer visible in reports and dashboard.
-- [x] Official Hackathon pre-seeded demonstration workspace (`/demo`) fully operable offline.
+- [x] Official pre-seeded demonstration workspace (`/demo`) fully operable offline without external API keys.
 - [x] `.env.example` verified with no committed secrets.
 - [x] `.gitignore` verified to exclude `.env`, `.venv`, `node_modules`, and local SQLite databases.
 

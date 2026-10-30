@@ -60,7 +60,7 @@ export default function MissingGapsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-amber-600 uppercase">
-                  Innovation C
+                  Blind-Spot Synthesis
                 </span>
                 <span className="text-xs text-slate-400">·</span>
                 <span className="text-xs text-slate-500">Information Completeness Engine</span>

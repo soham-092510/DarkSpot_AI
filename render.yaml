@@ -1,29 +1,47 @@
+# DarkSpot AI — Render Blueprint (Infrastructure-as-Code)
+# Official deployment definition for Render Cloud Platform (https://render.com)
+#
+# Services created:
+# 1. darkspot-db: Managed PostgreSQL Database
+# 2. darkspot-api: FastAPI Python Backend Web Service
+# 3. darkspot-worker: Python Asynchronous Background Analysis Worker
+# 4. darkspot-frontend: Next.js 14 App Router Node Web Service
+
+databases:
+  - name: darkspot-db
+    databaseName: darkspot
+    user: darkspot
+    plan: free
+
 services:
-  # FastAPI Web Service
+  # 1. FastAPI REST API Web Service
   - type: web
     name: darkspot-api
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.11
       - key: ENVIRONMENT
         value: production
+      - key: LOG_LEVEL
+        value: INFO
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: darkspot-db
+          property: connectionString
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
         value: gemini-2.0-flash
       - key: TAVILY_API_KEY
         sync: false
-      - key: FRONTEND_URL
-        value: https://darkspot-ai.vercel.app
       - key: BACKEND_CORS_ORIGINS
-        value: '["http://localhost:3000","https://darkspot-ai.vercel.app"]'
+        value: '["*"]'
 
-  # Standalone Background Worker
+  # 2. Asynchronous Background Analysis Worker
   - type: worker
     name: darkspot-worker
     runtime: python
@@ -34,11 +52,31 @@ services:
         value: 3.10.11
       - key: ENVIRONMENT
         value: production
+      - key: LOG_LEVEL
+        value: INFO
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: darkspot-db
+          property: connectionString
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
         value: gemini-2.0-flash
       - key: TAVILY_API_KEY
         sync: false
+
+  # 3. Next.js 14 Frontend Web Application
+  - type: web
+    name: darkspot-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: darkspot-api
+          property: host

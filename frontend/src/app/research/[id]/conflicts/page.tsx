@@ -60,7 +60,7 @@ export default function ConflictsIntelligencePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-rose-600 uppercase">
-                  Innovation B
+                  Contradiction Engine
                 </span>
                 <span className="text-xs text-slate-400">·</span>
                 <span className="text-xs text-slate-500">Cross-Source Discrepancies</span>

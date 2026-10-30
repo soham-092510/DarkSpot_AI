@@ -1,6 +1,6 @@
 # DarkSpot AI — Complete Beginner-Friendly Deployment Guide
 
-This guide walks you step-by-step through deploying the entire **DarkSpot AI** platform to the cloud for the **Shinchan Online Hackathon 2026**.
+This guide walks you step-by-step through deploying the entire **DarkSpot AI** platform to the cloud for production.
 
 Deployment Architecture:
 - **Frontend**: Vercel (Next.js 14)
@@ -94,7 +94,7 @@ Obtaining an API key for the Tavily Search API to perform live research web sear
 ### 2. Step-by-Step Instructions
 1. Open [https://app.tavily.com/](https://app.tavily.com/) and sign in (supports Google sign-in).
 2. On your dashboard, copy your **API Key** (it looks like `tvly-...`).
-3. The free plan includes 1,000 free searches per month, which is plenty for hackathon evaluation.
+3. The free plan includes 1,000 free searches per month, which is ideal for testing and demonstration.
 
 ---
 
@@ -225,4 +225,4 @@ Open your live Vercel URL and test the complete workflow:
    - Confirm that the workspace opens and the background analysis completes successfully!
 4. **Export Dossier**: Click **Export Dossier** (`/research/[id]/report`) and verify the full markdown audit dossier renders.
 
-Congratulations! Your **DarkSpot AI** platform is live in production and ready for hackathon evaluation!
+Congratulations! Your **DarkSpot AI** platform is live in production!

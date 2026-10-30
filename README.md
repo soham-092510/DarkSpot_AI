@@ -3,8 +3,8 @@
 > **"See What's Missing."**  
 > *An evidence-first research intelligence platform that identifies potential information gaps, conflicting claims, outdated details, and unanswered questions across multiple sources.*
 
-**Hackathon**: Shinchan Online Hackathon 2026  
-**Category**: Web Development, Artificial Intelligence, Research & IT  
+**Category**: Enterprise AI, Research Intelligence, Decision Support  
+**Platform**: Full-stack Next.js 14 App Router + FastAPI Monolith  
 **GitHub Repository**: [https://github.com/soham-092510/DarkSpot_AI](https://github.com/soham-092510/DarkSpot_AI)
 
 ---
@@ -94,9 +94,9 @@ flowchart LR
 
 ---
 
-## 4. Official Hackathon Evaluation Demo Walkthrough
+## 4. Interactive Sample Demonstration Casebook
 
-The platform includes a pre-seeded, high-fidelity demonstration scenario (**ABC Scholarship 2026**) accessible directly via `/demo` without requiring external API keys:
+The platform includes a pre-seeded, high-fidelity demonstration scenario (**ABC Scholarship 2026**) accessible directly via `/demo`:
 
 1. **4 Information Dimensions Evaluated**: Eligibility & Academic Criteria, Financial Thresholds, Required Documentation, and Renewal Policy.
 2. **1 Critical Contradiction Detected**:
@@ -180,19 +180,18 @@ Refer to the complete, beginner-friendly [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUID
 
 ---
 
-## 8. Judging Criteria Mapping (10 Marks Total)
-
-| Criteria | Weight | How DarkSpot AI Delivers |
-| :--- | :---: | :--- |
-| **Working Prototype & Functionality** | **2.5 / 10** | Fully interactive end-to-end web app with project creation, document parsing, claim extraction, checklist toggles, and dossier export. |
-| **Innovation & Originality** | **2.0 / 10** | Goes far beyond search/chatbots through Evidence Coverage Matrix, Contradiction Intelligence, and Blind-Spot Radar. |
-| **Problem Understanding & Relevance** | **1.5 / 10** | Directly addresses the official problem statement by focusing on *information completeness and verification*. |
-| **Technical Implementation** | **1.5 / 10** | Modular monolith with Next.js App Router, FastAPI, dual SQLite/Postgres support, and background job queue. |
-| **Evidence, Accuracy & Transparency** | **1.5 / 10** | Strict verbatim quoting, zero hallucinated citations, explicit uncertainty labels, and SSRF security guard. |
-| **Presentation & Demo** | **1.0 / 10** | Enterprise light design system, dedicated `/demo` evaluation showcase, and complete documentation. |
+## 8. Enterprise Platform Strengths
+ 
+| Capability | Platform Delivery | Value Proposition |
+| :--- | :--- | :--- |
+| **Cross-Source Evidence Synthesis** | Fully interactive end-to-end web app with project creation, document parsing, claim extraction, and checklist toggles. | Eliminates human oversight in critical documents. |
+| **Contradiction Intelligence** | Automated claim pairing, discrepancy detection, temporal divergence alerts, and severity classification. | Prevents relying on conflicting or outdated guidelines. |
+| **Blind-Spot Radar & Gap Analysis** | Weighted coverage scoring, missing dimension isolation, and proactive questions. | Reveals what is missing before making decisions. |
+| **Architectural Rigor** | Modular monolith with Next.js App Router, FastAPI, dual SQLite/Postgres support, and background job queue. | Easy to run locally and scales seamlessly to production. |
+| **Evidence Transparency & Security** | Strict verbatim quoting, zero hallucinated citations, explicit uncertainty labels, and SSRF security guard. | Auditable intelligence you can trust. |
 
 ---
 
 ## 9. License
 
-MIT License — Developed for the Shinchan Online Hackathon 2026.
+MIT License — Copyright (c) 2026 DarkSpot AI. All rights reserved.

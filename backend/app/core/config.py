@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
-    SECRET_KEY: str = "darkspot-hackathon-super-secret-key-change-in-production-2026"
+    SECRET_KEY: str = "darkspot-ai-super-secret-key-change-in-production-2026"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
