@@ -1,0 +1,44 @@
+services:
+  # FastAPI Web Service
+  - type: web
+    name: darkspot-api
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.11
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://darkspot-ai.vercel.app
+      - key: BACKEND_CORS_ORIGINS
+        value: '["http://localhost:3000","https://darkspot-ai.vercel.app"]'
+
+  # Standalone Background Worker
+  - type: worker
+    name: darkspot-worker
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python -m backend.app.workers.analysis_worker
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.11
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: TAVILY_API_KEY
+        sync: false
