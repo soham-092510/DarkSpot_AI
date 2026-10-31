@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from backend.app.core.database import get_db
-from backend.app.api.deps import get_current_user, get_optional_user, DEMO_PROJECT_ID
+from backend.app.api.deps import get_current_user, get_optional_user, DEMO_PROJECT_ID, PUBLIC_PROJECT_IDS
 from backend.app.models.all_models import (
     User, Project, Source, Dimension, Claim, Finding, Task, Job, Report
 )
@@ -106,12 +106,12 @@ def get_project_details(
     user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
-    if project_id != DEMO_PROJECT_ID:
+    if project_id not in PUBLIC_PROJECT_IDS:
         if not user:
             raise HTTPException(status_code=401, detail="Authentication required.")
         project = db.query(Project).filter(Project.id == project_id, Project.user_id == user.id).first()
     else:
-        project = db.query(Project).filter(Project.id == DEMO_PROJECT_ID).first()
+        project = db.query(Project).filter(Project.id == project_id).first()
 
     if not project:
         raise HTTPException(status_code=404, detail="Research project not found.")

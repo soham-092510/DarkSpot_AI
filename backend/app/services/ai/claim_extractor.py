@@ -1,3 +1,4 @@
+import re
 import logging
 from typing import List, Dict, Any, Optional
 from backend.app.services.ai.gemini_client import GeminiClient

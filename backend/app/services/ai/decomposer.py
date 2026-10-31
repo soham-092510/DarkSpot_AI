@@ -128,6 +128,53 @@ def decompose_question(topic_question: str, api_key: Optional[str] = None) -> Di
             ]
         }
 
+    elif any(k in q_lower for k in ["jee", "exam", "admission", "entrance", "neet", "gate", "cutoff", "iit", "nit", "eligibility"]):
+        return {
+            "dimensions": [
+                {
+                    "name": "75% Board Aggregate & Top 20 Percentile Rule",
+                    "category": "Academic Eligibility",
+                    "importance_weight": 3.0,
+                    "description": "Requirement of 75% marks in Class 12 (65% for SC/ST/PwD) or standing in top 20 percentile of qualifying board."
+                },
+                {
+                    "name": "Maximum Allowable Attempts (Main vs Advanced)",
+                    "category": "Attempt Limits",
+                    "importance_weight": 3.0,
+                    "description": "Limit of 3 consecutive attempts for JEE Main vs maximum 2 consecutive attempts for JEE Advanced."
+                },
+                {
+                    "name": "Age Limit & Date of Birth Threshold",
+                    "category": "Demographics",
+                    "importance_weight": 2.5,
+                    "description": "No age limit for JEE Main; specific date of birth cutoff threshold for JEE Advanced candidates."
+                },
+                {
+                    "name": "Compulsory Subject Combinations",
+                    "category": "Curriculum",
+                    "importance_weight": 2.5,
+                    "description": "Mandatory Physics and Mathematics with Chemistry, Biotechnology, Biology or Technical Vocational subject."
+                },
+                {
+                    "name": "State Code of Eligibility & Home State Quota",
+                    "category": "Quotas & Domicile",
+                    "importance_weight": 2.0,
+                    "description": "Determination of 50% Home State quota in NITs based on Class 12 examination center state."
+                },
+                {
+                    "name": "Category Reservation & Certificate Cutoff Dates",
+                    "category": "Reservation",
+                    "importance_weight": 2.0,
+                    "description": "Rules and mandatory issue dates for OBC-NCL, Gen-EWS, SC, ST, and PwD reservation certificates."
+                }
+            ],
+            "search_queries": [
+                f"{topic_question} 75 percent rule top 20 percentile",
+                f"{topic_question} number of attempts age limit",
+                f"{topic_question} nta information bulletin official"
+            ]
+        }
+
     # General / Default Research Topic
     return {
         "dimensions": [
